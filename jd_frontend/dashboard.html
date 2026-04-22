@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JD School Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+  <!-- Sidebar -->
+  <div class="bg-dark text-white p-3" style="width:250px; height:100vh;">
+    <h3>JD System</h3>
+    <hr>
+
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('dashboard.html')">Dashboard</button>
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('students.html')">Students</button>
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('teachers.html')">Teachers</button>
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('attendance.html')">Attendance</button>
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('marks.html')">Marks</button>
+    <button class="btn btn-outline-light w-100 mb-2" onclick="go('fees.html')">Fees</button>
+  </div>
+
+  <!-- Main -->
+  <div class="p-4 w-100">
+
+    <h2>Dashboard</h2>
+
+    <div class="row mt-4">
+
+      <div class="col-md-4">
+        <div class="card shadow p-3">
+          <h5>Total Students</h5>
+          <h2 id="students">0</h2>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow p-3">
+          <h5>Total Teachers</h5>
+          <h2 id="teachers">0</h2>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow p-3">
+          <h5>Pending Fees</h5>
+          <h2 id="fees">0</h2>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function go(page){
+  window.location.href = page;
+}
+
+function load(){
+  fetch("http://localhost:5100/jd_dashboard")
+  .then(res=>res.json())
+  .then(data=>{
+    document.getElementById("students").innerText = data.students;
+    document.getElementById("teachers").innerText = data.teachers;
+    document.getElementById("fees").innerText = data.pendingFees;
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>

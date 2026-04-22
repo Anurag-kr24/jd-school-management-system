@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Students</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+  <h2 class="mb-3">Students</h2>
+
+  <!-- Add Student Card -->
+  <div class="card p-3 mb-4 shadow">
+    <input id="name" class="form-control mb-2" placeholder="Enter Name">
+    <input id="cls" class="form-control mb-2" placeholder="Enter Class">
+    <button class="btn btn-primary" onclick="add()">Add Student</button>
+  </div>
+
+  <!-- Table -->
+  <table class="table table-bordered table-hover bg-white shadow">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Class</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
+</div>
+
+<script>
+
+// ✅ ADD STUDENT
+async function add(){
+  const nameVal = document.getElementById("name").value.trim();
+  const classVal = document.getElementById("cls").value.trim();
+
+  if(nameVal === "" || classVal === ""){
+    alert("Fill all fields");
+    return;
+  }
+
+  await fetch("http://localhost:5100/jd_students_api/add",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      jd_name: nameVal,
+      jd_class: classVal
+    })
+  });
+
+  // clear fields
+  document.getElementById("name").value = "";
+  document.getElementById("cls").value = "";
+
+  load();
+}
+
+// ✅ LOAD STUDENTS
+async function load(){
+  const res = await fetch("http://localhost:5100/jd_students_api/all");
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach((s, index)=>{
+    const name = s.jd_name ? s.jd_name : "No Name";
+    const cls = s.jd_class ? s.jd_class : "No Class";
+
+    list.innerHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${name}</td>
+        <td>${cls}</td>
+        <td>
+          <button class="btn btn-sm btn-warning" onclick="edit('${s._id}', '${name}', '${cls}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="del('${s._id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// ✅ DELETE
+async function del(id){
+  await fetch(`http://localhost:5100/jd_students_api/delete/${id}`,{
+    method:"DELETE"
+  });
+  load();
+}
+
+// ✅ EDIT
+function edit(id, oldName, oldClass){
+  const newName = prompt("Enter new name:", oldName);
+  const newClass = prompt("Enter new class:", oldClass);
+
+  if(!newName || !newClass){
+    alert("Invalid input");
+    return;
+  }
+
+  fetch(`http://localhost:5100/jd_students_api/update/${id}`,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      jd_name: newName,
+      jd_class: newClass
+    })
+  }).then(load);
+}
+
+// load on start
+load();
+
+</script>
+
+</body>
+</html>
